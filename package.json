@@ -37,7 +37,6 @@
     "moment-timezone": "^0.5.43",
     "mongodb-client-encryption": "^2.8.0",
     "mongoose": "^5.13.13",
-    "mongoose-auto-increment": "^5.0.1",
     "net-browserify": "^0.1.4",
     "node-cron": "^3.0.2",
     "path": "^0.12.7",
