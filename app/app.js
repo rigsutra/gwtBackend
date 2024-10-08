@@ -31,7 +31,7 @@ const app = express();
 
 // app.use(cors({ origin: "http://localhost:3000" }));
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: "https://gwtech-ashish-singhs-projects-8b8f084b.vercel.app/",
   credentials: true, // Allow credentials (cookies, headers)
 };
 app.use(cors(corsOptions));
