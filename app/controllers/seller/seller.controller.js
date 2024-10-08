@@ -11,7 +11,7 @@ const LimitCalc = db.limitCalc;
 const BlockNumber = db.blockNumber;
 const SpecificLimits = db.specificLimits;
 
-const zlib = require("zlib");
+const browserify_zlib = require("browserify-zlib");
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -36,16 +36,20 @@ exports.signIn = async (req, res) => {
     }
 
     if (!user.subAdminId.isActive) {
-      res.send(encoding({
-        success: false,
-        message: "Votre compagnie est deconnecée",
-      }));
+      res.send(
+        encoding({
+          success: false,
+          message: "Votre compagnie est deconnecée",
+        })
+      );
       return;
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      res.send(encoding({ success: false, message: "Mot de passe incorrecte" }));
+      res.send(
+        encoding({ success: false, message: "Mot de passe incorrecte" })
+      );
       return;
     }
 
@@ -102,10 +106,12 @@ exports.newTicket = async (req, res) => {
 
       if (!success) {
         console.log("ticket check error: ", error);
-        return res.send(encoding({
-          success: false,
-          message: "ticket save failed! try again!",
-        }));
+        return res.send(
+          encoding({
+            success: false,
+            message: "ticket save failed! try again!",
+          })
+        );
       }
 
       if (new_numbers.length > 0) {
@@ -120,39 +126,47 @@ exports.newTicket = async (req, res) => {
         await ticket.save((err, savedTicket) => {
           if (err) {
             console.log("new ticket data error :", err);
-            res.send(encoding({
-              success: false,
-              message: "new ticket create failed! please try again!",
-            }));
+            res.send(
+              encoding({
+                success: false,
+                message: "new ticket create failed! please try again!",
+              })
+            );
             return;
           } else {
             const newId = savedTicket.ticketId;
-            res.send(encoding({
-              success: true,
-              message: "success",
-              ticketId: newId,
-              numbers: new_numbers,
-              limit_data,
-              block_data,
-            }));
+            res.send(
+              encoding({
+                success: true,
+                message: "success",
+                ticketId: newId,
+                numbers: new_numbers,
+                limit_data,
+                block_data,
+              })
+            );
             return;
           }
         });
       } else {
-        res.send(encoding({
-          success: true,
-          message: "you cant create ticket!",
-          numbers: new_numbers,
-          limit_data,
-          block_data,
-        }));
+        res.send(
+          encoding({
+            success: true,
+            message: "you cant create ticket!",
+            numbers: new_numbers,
+            limit_data,
+            block_data,
+          })
+        );
         return;
       }
     } else {
-      res.send(encoding({
-        success: false,
-        message: `Haiti local time now: ${currentTime}. \n Time is up!. Sorry you cann't create ticket.`,
-      }));
+      res.send(
+        encoding({
+          success: false,
+          message: `Haiti local time now: ${currentTime}. \n Time is up!. Sorry you cann't create ticket.`,
+        })
+      );
       return;
     }
   } catch (err) {
@@ -1127,7 +1141,7 @@ exports.deleteTicketForever = async (req, res) => {
 // Ticket Replay
 exports.replayTicket = async (req, res) => {
   try {
-    const { tId, date, lottery, newLottery} = req.body;
+    const { tId, date, lottery, newLottery } = req.body;
 
     // lottery time check
     const currentTime = moment().tz(haitiTimezone).format("HH:mm");
@@ -1138,32 +1152,44 @@ exports.replayTicket = async (req, res) => {
       ) &&
       moment(currentTime, "HH:mm").isBefore(moment(lotInfo.endTime, "HH:mm"))
     ) {
-      const match = await Ticket.findOne({date: date, ticketId: tId, lotteryCategoryName: lottery, seller: req.userId}, {numbers: 1});
+      const match = await Ticket.findOne(
+        {
+          date: date,
+          ticketId: tId,
+          lotteryCategoryName: lottery,
+          seller: req.userId,
+        },
+        { numbers: 1 }
+      );
 
-      if(match) {
-        res.send(encoding({
-          success: true,
-          numbers: match.numbers
-        }))
+      if (match) {
+        res.send(
+          encoding({
+            success: true,
+            numbers: match.numbers,
+          })
+        );
       } else {
-        res.send(encoding({
-          success: false,
-          message: "Not Found Data!"
-        }))
+        res.send(
+          encoding({
+            success: false,
+            message: "Not Found Data!",
+          })
+        );
       }
-
     } else {
-      res.send(encoding({
-        success: false,
-        message: "Lottery time check failed!"
-      }));
+      res.send(
+        encoding({
+          success: false,
+          message: "Lottery time check failed!",
+        })
+      );
       return;
     }
   } catch {
-    res.send({success: false, data: false});
+    res.send({ success: false, data: false });
   }
-}
-
+};
 
 // This is check blocked seller. like this middleware.
 exports.isActive = (req, res, next) => {
@@ -1176,12 +1202,12 @@ exports.isActive = (req, res, next) => {
       next();
       return;
     }
-    
-    res.send(encoding({success: false, message: "Unauthorized!"}));
+
+    res.send(encoding({ success: false, message: "Unauthorized!" }));
     return;
   });
 };
 
 function encoding(data) {
-  return zlib.gzipSync(JSON.stringify(data));
+  return browserify_zlib.gzipSync(JSON.stringify(data));
 }
