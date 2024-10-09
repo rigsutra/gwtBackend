@@ -9,7 +9,7 @@ module.exports = function (app) {
 
   // ticket sale reports
   app.get(
-    "/api/superVisor/getsalereports",
+    "/api/superVisor/getSaleReports",
     [authJwt.verifyToken],
     controller.getSaleReports
   );
